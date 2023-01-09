@@ -3,7 +3,7 @@
 ------------------------------
 
 if icbat_bamg_character_map == nil then
-    -- holds full player name (slug + server) -> money in copper
+    -- [{ qualified_char_name, money_in_copper }]
     icbat_bamg_character_map = {}
 end
 
@@ -18,18 +18,35 @@ local function get_my_qualified_name()
     return qualified_name
 end
 
-local function update_cached_data(my_raw_gold)
+local function upsert_by_qualified_name(qualified_char_name, to_store)
+    for i, stored_character in ipairs(icbat_bamg_character_map) do
+        if stored_character["qualified_char_name"] == qualified_char_name then
+            icbat_bamg_character_map[i] = to_store
+            return
+        end
+    end
+
+    table.insert(icbat_bamg_character_map, to_store)
+end
+
+local function update_cached_data(my_gold_in_copper)
     local include_server_name = true
-    local my_full_name = get_my_qualified_name()
+    local my_qualified_char_name = get_my_qualified_name()
     local _localized_class_name, canonical_class_name = UnitClass("player")
-    icbat_bamg_character_map[my_full_name] = my_raw_gold
-    icbat_bamg_character_class_name[my_full_name] = canonical_class_name
+    icbat_bamg_character_class_name[my_qualified_char_name] = canonical_class_name
+
+    local to_store = {
+        qualified_char_name = my_qualified_char_name,
+        money_in_copper = my_gold_in_copper
+    }
+
+    upsert_by_qualified_name(my_qualified_char_name, to_store)
 end
 
 local function calculate_total_known_gold()
     local total = 0
-    for _, gold_in_copper in pairs(icbat_bamg_character_map) do
-       total = total + gold_in_copper
+    for _i, stored in ipairs(icbat_bamg_character_map) do
+       total = total + stored["money_in_copper"]
     end
     return total
 end
@@ -53,9 +70,19 @@ local function build_tooltip(self)
     add_header(self)
     self:AddSeparator()
 
-    for full_character_name, gold in pairs(icbat_bamg_character_map) do
-        self:AddLine(Ambiguate(full_character_name, "all"), GetMoneyString(gold))
-        color_first_col_by_class_name(self, full_character_name)
+    table.sort(icbat_bamg_character_map, function(a,b)
+        if a["money_in_copper"] ~= b["money_in_copper"] then
+            return a["money_in_copper"] > b["money_in_copper"]
+        end
+
+        return a["qualified_char_name"] < b["qualified_char_name"]
+    end)
+
+    for _i, stored in ipairs(icbat_bamg_character_map) do
+        local qualified_char_name = stored["qualified_char_name"]
+        local money_in_copper = stored["money_in_copper"]
+        self:AddLine(Ambiguate(qualified_char_name, "all"), GetMoneyString(money_in_copper))
+        color_first_col_by_class_name(self, qualified_char_name)
     end
 end
 
@@ -103,14 +130,14 @@ end
 function dataobj:OnLeave()
 end
 
-local function set_label(my_gold_raw)
-    dataobj.text = GetMoneyString(my_gold_raw)
+local function set_label(my_gold_in_copper)
+    dataobj.text = GetMoneyString(my_gold_in_copper)
 end
 
 local function event_handler()
-    local my_gold_raw = GetMoney() -- in copper
-    set_label(my_gold_raw)
-    update_cached_data(my_gold_raw)
+    local my_gold_in_copper = GetMoney() -- in copper
+    set_label(my_gold_in_copper)
+    update_cached_data(my_gold_in_copper)
 end
 
 -- invisible frame for updating/hooking events
