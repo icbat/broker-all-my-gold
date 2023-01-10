@@ -2,7 +2,7 @@
 ## Title: Broker: All My Gold
 ## Notes: Displays gold across all of your characters in a LDB display addon
 ## Author: @icbat
-## Version: 1
+## Version: 2
 ## SavedVariables: icbat_bamg_character_map, icbat_bamg_character_class_name
 
 ## Dependencies

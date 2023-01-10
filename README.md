@@ -3,7 +3,7 @@ Broker: All My Gold
 
 A Data Broker addon for showing all your characters' gold.
 
-Get it on [WoW Interface](https://wowinterface.com/downloads/info25623-BrokerCalltoArms) or use the [Cursebreaker tool](https://github.com/AcidWeb/CurseBreaker) (recommended)
+Get it on [WoW Interface](https://www.wowinterface.com/downloads/info26524-BrokerAllMyGold.html) or use the [Cursebreaker tool](https://github.com/AcidWeb/CurseBreaker) (recommended)
 
 ## Contributing
 
