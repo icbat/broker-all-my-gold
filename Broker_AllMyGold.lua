@@ -2,13 +2,15 @@
 --- Initialize Saved Variables
 ------------------------------
 
+-- stored this way so it's easily sorted
 if icbat_bamg_character_map == nil then
     -- [{ qualified_char_name, money_in_copper }]
     icbat_bamg_character_map = {}
 end
 
+-- for colorizing the character names in tooltips
 if icbat_bamg_character_class_name == nil then
-    -- char name -> class name
+    -- char name -> canonical (not localized) class name
     icbat_bamg_character_class_name = {}
 end
 
@@ -144,6 +146,5 @@ end
 local f = CreateFrame("frame")
 -- on login
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
-f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("PLAYER_MONEY")
 f:SetScript("OnEvent", event_handler)
